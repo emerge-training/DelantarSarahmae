@@ -3,7 +3,7 @@ import jk.widget.common
 
 class #widget:
 
-model
+model Note
 {
 	fullname as string
     surname as string
@@ -59,10 +59,10 @@ func initializeWidget override
 {
 	base.initializeWidget()
 	var savebtn = ButtonWidget.forText(context, "SAVE", func {
-		var notelist = new Notelist()
-		notelist.setFullname(fullname.getWidgetText())
-		notelist.setSurname(surname.getWidgetText())
-		APIClient.getInstance().addNotelistapp(notelist.toDynamicMap(), func(response as DynamicMap) {
+		var note = new Note()
+		note.setFullname(fullname.getWidgetText())
+		note.setSurname(surname.getWidgetText())
+		APIClient.getInstance().addNotelistapp(note.toDynamicMap(), func(response as DynamicMap) {
 			context.showMessageDialog("Notice","Recorded")
 			fullname.setWidgetText("")
 			surname.setWidgetText("")

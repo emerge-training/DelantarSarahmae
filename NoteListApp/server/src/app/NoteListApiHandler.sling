@@ -26,7 +26,7 @@ func postProcess(req as HTTPWorkerRequest, resp as HTTPWorkerResponse) override:
 
 GET "/note"
 {
-    var note = assert getDatabase().getNotelistapp()
+    var note = assert getDatabase().getNote()
     sendOk note
 }
 
@@ -37,7 +37,7 @@ POST "/note"
     var note = new NoteListDatabase.Note()
     note.setFullname(requestData.getFullname())
     note.setSurname(requestData.getSurname())
-    assert getDatabase().addNotelistapp(note):
+    assert getDatabase().addNote(note):
         sendError "failedToSaveNote"
     sendOk
 }
@@ -49,14 +49,14 @@ PUT "/note/:id"
     var note = new NoteListDatabase.Note()
     note.setFullname(requestData.getFullname())
     note.setSurname(requestData.getSurname())
-    assert getDatabase().updateNotelistapp(vars.getString("id"), note):
+    assert getDatabase().updateNote(vars.getString("id"), note):
         sendError "failedToUpdateNote"
     sendOk
 }
 
 DELETE "/note/:id"
 {
-    assert getDatabase().deleteNotelistapp(vars.getString("id")):
+    assert getDatabase().deleteNote(vars.getString("id")):
         sendError "failedToDeleteNote"
     sendOk
 }

@@ -50,7 +50,7 @@ func initializeWidget override
 {
 	base.initializeWidget()
 	var deletebtn = ButtonWidget.forText(context, "DELETE", func {
-        APIClient.getInstance().getNote(func(response as DynamicMap){
+        APIClient.getInstance().getNotelistapp(func(response as DynamicMap){
 			var data = assert response.getDynamicMap("data")
 			var records = data.getDynamicVector("records")
 			foreach record as DynamicMap in records.toVector(){

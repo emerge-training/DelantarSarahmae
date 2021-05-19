@@ -3,7 +3,7 @@ import jk.widget.common
 
 class #widget:
 
-model
+model Note
 {
 	fullname as string
     surname as string
@@ -75,7 +75,7 @@ func initializeWidget override
 			var records = data.getDynamicVector("records")
 			foreach record as DynamicMap in records.toVector(){
 				if record.getString("id") == id.getWidgetText(){
-					var note = new Notes()
+					var note = new Note()
 					var popup = new PopupDialogManager(context, this)
 					popup.showConfirmDialog("Confirmation","Sure to Update ?", func{
 						note.setFullname(fullname.getWidgetText())

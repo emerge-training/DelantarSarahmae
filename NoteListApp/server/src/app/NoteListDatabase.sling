@@ -52,7 +52,6 @@ func updateTables
 func addNote(note as Note) as Note
 {
     assert note
-    note.setTimeStampAddedValue(SystemClock.asUTCSeconds())
     assert db.executeSync(db.prepareInsertStatementSync(NOTE, note.toDynamicMap()))
     return note
 }
@@ -60,7 +59,6 @@ func addNote(note as Note) as Note
 func updateNote(id as string, note as Note) as bool
 {
     assert note
-    note.setTimeStampLastUpdatedValue(SystemClock.asUTCSeconds())
     var criteria = new Note()
     criteria.setId(id)
     return db.executeSync(db.prepareUpdateStatementSync(NOTE, criteria.toDynamicMap(), note.toDynamicMap()))

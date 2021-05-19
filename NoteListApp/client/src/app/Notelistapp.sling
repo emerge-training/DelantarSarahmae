@@ -70,7 +70,7 @@ func initializeWidget override
 	grid.addColumn("Surname", "surname", 1.0)
     
 	grid.addWidgetHeaderRow()
-    APIClient.getInstance().getNote(func(response as DynamicMap){
+    APIClient.getInstance().getNotelistapp(func(response as DynamicMap){
         var data = assert response.getDynamicMap("data")
         var records = data.getDynamicVector("records")
         if not records || records.getSize() < 1{
