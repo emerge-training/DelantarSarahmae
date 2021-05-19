@@ -59,10 +59,10 @@ func initializeWidget override
 {
 	base.initializeWidget()
 	var savebtn = ButtonWidget.forText(context, "SAVE", func {
-		var tasklist = new Tasklist()
-		tasklist.setFullname(fullname.getWidgetText())
-		tasklist.setSurname(surname.getWidgetText())
-		APIClient.getInstance().addTask(tasklist.toDynamicMap(), func(response as DynamicMap) {
+		var task = new Task()
+		task.setFullname(fullname.getWidgetText())
+		task.setSurname(surname.getWidgetText())
+		APIClient.getInstance().addTask(task.toDynamicMap(), func(response as DynamicMap) {
 			context.showMessageDialog("Notice","Recorded")
 			fullname.setWidgetText("")
 			surname.setWidgetText("")
