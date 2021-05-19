@@ -5,8 +5,8 @@ class is HTTPRPCRouter #webapi2:
 
 model TaskRequest
 {
-    name as string
-    description as string
+    fullname as string
+    surname as string
 }
 
 var db as TasklistDatabase
@@ -35,8 +35,8 @@ POST "/task"
     var requestData = assert TaskRequest.forJsonString(req.getBodyString()):
         sendError "invalidRequest"
     var task = new TasklistDatabase.Task()
-    task.setName(requestData.getName())
-    task.setDescription(requestData.getDescription())
+    task.setFullname(requestData.getFullname())
+    task.setSurname(requestData.getSurname())
     assert getDatabase().addTask(task):
         sendError "failedToSaveTask"
     sendOk
@@ -47,11 +47,11 @@ PUT "/task/:id"
     var requestData = assert TaskRequest.forJsonString(req.getBodyString()):
         sendError "invalidRequest"
     var task = new TasklistDatabase.Task()
-    task.setName(requestData.getName())
-    task.setDescription(requestData.getDescription())
+    task.setFullname(requestData.getFullname())
+    task.setSurname(requestData.getSurname())
     assert getDatabase().updateTask(vars.getString("id"), task):
         sendError "failedToUpdateTask"
-        sendOk
+    sendOk
 }
 
 DELETE "/task/:id"
