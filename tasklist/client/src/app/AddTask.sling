@@ -1,0 +1,75 @@
+import jk.widget
+import jk.widget.common
+
+class #widget:
+
+model Task
+{
+	fullname as string
+    surname as string
+}
+
+ui VerticalBoxWidget
+{
+	spacing = context.getHeightValue("2000um")
+    margin = context.getHeightValue("5mm")
+    HorizontalBoxWidget {
+        spacing = context.getHeightValue("100um")
+        TextButtonWidget Viewbtn : 1.0 {
+            text = "List of Participants"
+            padding = context.getHeightValue("1000um")
+            backgroundColor = Color.instance("#F2eded")
+            clickHandler = func {
+                onViewClicked()
+            }
+        }
+		
+    }
+	VerticalScrollerWidget {
+		scrollBarDisabled = true
+		LayerWithBackgroundColorWidget container {
+            color = Color.instance("#F2eded")
+		AlignWidget {
+			VerticalBoxWidget vbox : 0.5, 0.5, false {
+				margin = context.getHeightValue("5mm")
+				spacing = context.getHeightValue("2000um")
+				TextInputWidget fullname {
+					type = TextInputWidget.TYPE_NAME
+					placeholder = "Fullname"
+					backgroundColor = Color.white()
+					fontSize = context.getHeightValue("2mm")
+					padding = context.getHeightValue("2500um")
+				}
+				TextInputWidget surname {
+					type = TextInputWidget.TYPE_NAME
+					placeholder = "SURNAME"
+					backgroundColor = Color.white()
+					fontSize = context.getHeightValue("2mm")
+					padding = context.getHeightValue("2500um")
+				}
+			}
+		}
+		}
+	}
+}
+func onViewClicked:
+	NavigationWidget.switchToContainer(this, new Tasklist(context))
+
+func initializeWidget override
+{
+	base.initializeWidget()
+	var savebtn = ButtonWidget.forText(context, "SAVE", func {
+		var tasklist = new Tasklist()
+		tasklist.setFullname(fullname.getWidgetText())
+		tasklist.setSurname(surname.getWidgetText())
+		APIClient.getInstance().addTask(tasklist.toDynamicMap(), func(response as DynamicMap) {
+			context.showMessageDialog("Notice","Recorded")
+			fullname.setWidgetText("")
+			surname.setWidgetText("")
+	},  func (error as Error){
+			context.showMessageDialog("Notice","Record Failed!")
+		})
+})
+	savebtn.setWidgetFontSize(context.getHeightValue("4mm"))
+	vbox.addWidget(savebtn)
+}

@@ -1,42 +1,73 @@
 import jk.widget.common
+import jk.widget.datagrid
 
-class is TitledWidget #widget:
+class #widget:
 
-ui LayerWidget
+ui VerticalBoxWidget
 {
-    VerticalScrollerWidget {
-        scrollBarDisabled = true
-        LayerWithBackgroundColorWidget container {
-            color = Color.white()
-            VerticalBoxWidget list {
-                margin = context.getHeightValue("5mm")
-                spacing = context.getHeightValue("5mm")
+    spacing = context.getHeightValue("2000um")
+    margin = context.getHeightValue("5mm")
+    HorizontalBoxWidget {
+        spacing = context.getHeightValue("100um")
+        TextButtonWidget btnAdd : 1.0 {
+            text = "ADD TASK"
+            padding = context.getHeightValue("1000um")
+            backgroundColor = Color.instance("#F2eded")
+            clickHandler = func {
+                onViewClicked()
             }
+        
         }
+    }
+    VerticalScrollerWidget {
+		scrollBarDisabled = false
+		LayerWithBackgroundColorWidget container {
+            color = Color.instance("#F2eded")
+		AlignWidget {
+			VerticalBoxWidget vbox : 0.5, 0.5, false {
+				margin = context.getHeightValue("5mm")
+				spacing = context.getHeightValue("2000um") 
+                LabelWidget {
+					text = "TASK LIST"
+					textColor = Color.black()
+					fontSize = context.getHeightValue("5mm")
+					textAlign = LabelWidget.ALIGN_CENTER
+					fontBold = true
+				}  
+            } 
+        }
+        DataGridWidget grid{
+                    cellPadding = 1
+        }
+    }
     }
 }
 
 func initializeWidget override
 {
     base.initializeWidget()
-    APIClient.getInstance().getTasks(func(response as DynamicMap) {
+    grid.addColumn("ID", "id", 0.5)
+	grid.addColumn("FullName", "fullname", 1.0)
+	grid.addColumn("Surname", "surname", 1.0)
+    
+	grid.addWidgetHeaderRow()
+    APIClient.getInstance().getTasks(func(response as DynamicMap){
         var data = assert response.getDynamicMap("data")
         var records = data.getDynamicVector("records")
-        if not records || records.getSize() <1 {
-            list.addWidget(AlignWidget.forWidget(context, LabelWidget.forText(context, "No records")), 1.0)
+        if not records || records.getSize() < 1{
+            grid.addRow([ "No Task!" ])
         }
         else {
             foreach record as DynamicMap in records.toVector() {
-                var task  = record.getString("name") .. " - " .. record.getString("unknown")
-                var lblTask = LabelWidget.forText(context, task)
-                var hbox = HorizontalBoxWidget.forContext(context, 0 , context.getHeightValue("0.5mm"))
-                hbox.addWidget(lblTask)
-                list.addWidget(AlignWidget.forWidget(context, hbox), 1.0)
+                
+                grid.addRow([ record.getString("id"), record.getString("fullname"), record.getString("surname") ])
             }
         }
+    },func(err as Error){
+        grid.addRow([ "Error" ])
     })
 }
 
-func getWidgetTitle as string:
-    return "Task list"
+func onViewClicked:
+    NavigationWidget.switchToContainer(this, new AddTask(context))
     
