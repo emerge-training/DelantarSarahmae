@@ -1,0 +1,97 @@
+import jk.widget.common
+import jk.widget.datagrid
+
+class #widget:
+
+ui VerticalBoxWidget
+{
+    spacing = context.getHeightValue("2000um")
+    margin = context.getHeightValue("5mm")
+    LabelWidget {
+		text = "NOTELIST APPLICATION"
+		textColor = Color.black()
+		fontSize = context.getHeightValue("5mm")
+		textAlign = LabelWidget.ALIGN_CENTER
+		fontBold = true
+				} 
+    HorizontalBoxWidget {
+        spacing = context.getHeightValue("100um")
+        TextButtonWidget addBtn : 1.0 {
+            text = "ADDING NOTELISTAPP"
+            padding = context.getHeightValue("1000um")
+            backgroundColor = Color.instance("#F2eded")
+            clickHandler = func {
+                onAddClicked()
+            }
+        
+        }
+        TextButtonWidget updateBtn : 1.0 {
+            text = "UPDATING NOTELISTAPP"
+            padding = context.getHeightValue("1000um")
+            backgroundColor = Color.instance("#F2eded")
+            clickHandler = func {
+                onUpdateClicked()
+            }
+        
+        }
+        TextButtonWidget deleteBtn : 1.0 {
+            text = "DELETING NOTELISTAPP"
+            padding = context.getHeightValue("1000um")
+            backgroundColor = Color.instance("#F2eded")
+            clickHandler = func {
+                onDeleteClicked()
+            }
+        
+        }
+    }
+    VerticalScrollerWidget {
+		scrollBarDisabled = true
+		LayerWithBackgroundColorWidget container {
+            color = Color.instance("#F2eded")
+		AlignWidget {
+			VerticalBoxWidget vbox : 0.5, 0.5, false {
+				margin = context.getHeightValue("40mm")
+				spacing = context.getHeightValue("2000um") 
+                
+            } 
+        }
+        DataGridWidget grid{
+                    cellPadding = 1
+        }
+    }
+    }
+}
+
+func initializeWidget override
+{
+    base.initializeWidget()
+    grid.addColumn("ID", "id", 0.5)
+	grid.addColumn("Fullname", "fullname", 1.0)
+	grid.addColumn("Surname", "surname", 1.0)
+    
+	grid.addWidgetHeaderRow()
+    APIClient.getInstance().getNote(func(response as DynamicMap){
+        var data = assert response.getDynamicMap("data")
+        var records = data.getDynamicVector("records")
+        if not records || records.getSize() < 1{
+            grid.addRow([ "No Records" ])
+        }
+        else {
+            foreach record as DynamicMap in records.toVector() {
+                
+                grid.addRow([ record.getString("id"), record.getString("fullname"), record.getString("surname") ])
+            }
+        }
+    },func(err as Error){
+        grid.addRow([ "Error" ])
+    })
+}
+
+func onAddClicked:
+    NavigationWidget.switchToContainer(this, new AddNotelistapp(context))
+
+func onUpdateClicked:
+    NavigationWidget.switchToContainer(this, new UpdateNotelistapp(context))
+
+func onDeleteClicked:
+    NavigationWidget.switchToContainer(this, new DeleteNotelistapp(context))

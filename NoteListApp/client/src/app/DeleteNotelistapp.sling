@@ -1,0 +1,76 @@
+import jk.widget
+import jk.widget.common
+
+class #widget:
+
+ui VerticalBoxWidget
+{
+	spacing = context.getHeightValue("2000um")
+    margin = context.getHeightValue("5mm")
+    HorizontalBoxWidget {
+        spacing = context.getHeightValue("100um")
+        TextButtonWidget btnHome : 1.0 {
+            text = "VIEW NOTE LIST"
+            padding = context.getHeightValue("1000um")
+            backgroundColor = Color.instance("#ffffff")
+            clickHandler = func {
+                NavigationWidget.switchToContainer(this, new Notelistapp(context))
+            }
+        }
+		
+    }
+	VerticalScrollerWidget {
+		scrollBarDisabled = true
+		LayerWithBackgroundColorWidget container {
+            color = Color.instance("#F2eded")
+		AlignWidget {
+			VerticalBoxWidget vbox : 0.5, 0.5, false {
+				margin = context.getHeightValue("5mm")
+				spacing = context.getHeightValue("2000um")
+				LabelWidget {
+					text = "DELETING NOTELISTAPP"
+					textColor = Color.black()
+					fontSize = context.getHeightValue("4mm")
+					textAlign = LabelWidget.ALIGN_CENTER
+					fontBold = true
+				}
+				TextInputWidget id {
+					type = TextInputWidget.TYPE_INTEGER
+					placeholder = "Id"
+					backgroundColor = Color.white()
+					fontSize = context.getHeightValue("2mm")
+					padding = context.getHeightValue("2500um")
+				}
+			}
+		}
+		}
+	}
+}
+func initializeWidget override
+{
+	base.initializeWidget()
+	var deletebtn = ButtonWidget.forText(context, "DELETE", func {
+        APIClient.getInstance().getNote(func(response as DynamicMap){
+			var data = assert response.getDynamicMap("data")
+			var records = data.getDynamicVector("records")
+			foreach record as DynamicMap in records.toVector(){
+				if record.getString("id") == id.getWidgetText(){
+					var popup = new PopupDialogManager(context, this)
+					popup.showConfirmDialog("Confirmation","sure to delete?", func{
+					    APIClient.getInstance().deleteNotelistapp(id.getWidgetText(), func(res as DynamicMap){
+							context.showMessageDialog("Notice", "Successfully deleted!")
+							id.setWidgetText("")
+						}, func(err as Error){
+							context.showMessageDialog("Notice", "Failed!")
+							})
+						}, func{
+								;
+							})
+				}
+			}
+        })
+})
+	deletebtn.setWidgetFontSize(context.getHeightValue("4mm"))
+	deletebtn.setWidgetBackgroundColor(Color.instance("#F2eded"))
+	vbox.addWidget(deletebtn)
+}

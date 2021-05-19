@@ -1,0 +1,102 @@
+import jk.widget
+import jk.widget.common
+
+class #widget:
+
+model
+{
+	fullname as string
+    surname as string
+}
+
+ui VerticalBoxWidget
+{
+	spacing = context.getHeightValue("2000um")
+    margin = context.getHeightValue("5mm")
+    HorizontalBoxWidget {
+        spacing = context.getHeightValue("100um")
+        TextButtonWidget btnHome : 1.0 {
+            text = "View Participants"
+            padding = context.getHeightValue("1000um")
+            backgroundColor = Color.instance("#ffffff")
+            clickHandler = func {
+                NavigationWidget.switchToContainer(this, new Notelistapp(context))
+            }
+        }
+		
+    }
+	VerticalScrollerWidget {
+		scrollBarDisabled = true
+		LayerWithBackgroundColorWidget container {
+            color = Color.instance("#F2eded")
+		AlignWidget {
+			VerticalBoxWidget vbox : 0.5, 0.5, false {
+				margin = context.getHeightValue("5mm")
+				spacing = context.getHeightValue("2000um")
+				LabelWidget {
+					text = "UPDATING NOTELISTAPP"
+					textColor = Color.black()
+					fontSize = context.getHeightValue("4mm")
+					textAlign = LabelWidget.ALIGN_CENTER
+					fontBold = true
+				}
+                TextInputWidget id {
+					type = TextInputWidget.TYPE_INTEGER
+					placeholder = "Id"
+					backgroundColor = Color.white()
+					fontSize = context.getHeightValue("2mm")
+					padding = context.getHeightValue("2500um")
+				}
+				TextInputWidget fullname {
+					type = TextInputWidget.TYPE_NAME
+					placeholder = "Fullname"
+					backgroundColor = Color.white()
+					fontSize = context.getHeightValue("2mm")
+					padding = context.getHeightValue("2500um")
+				}
+				TextInputWidget surname {
+					type = TextInputWidget.TYPE_NAME
+					placeholder = "Surname"
+					backgroundColor = Color.white()
+					fontSize = context.getHeightValue("2mm")
+					padding = context.getHeightValue("2500um")
+				}
+			}
+		}
+		}
+	}
+}
+func initializeWidget override
+{
+	base.initializeWidget()
+	var updatebtn = ButtonWidget.forText(context, "UPDATE", func {
+		APIClient.getInstance().getNotelistapp(func(response as DynamicMap){
+			var data = assert response.getDynamicMap("data")
+			var records = data.getDynamicVector("records")
+			foreach record as DynamicMap in records.toVector(){
+				if record.getString("id") == id.getWidgetText(){
+					var note = new Notes()
+					var popup = new PopupDialogManager(context, this)
+					popup.showConfirmDialog("Confirmation","Sure to Update ?", func{
+						note.setFullname(fullname.getWidgetText())
+						note.setSurname(surname.getWidgetText())
+						APIClient.getInstance().updateNotelistapp(id.getWidgetText(), note.toDynamicMap(), func(res as DynamicMap){
+							context.showMessageDialog("Notice", "Successfully updated!")
+							id.setWidgetText("")
+							fullname.setWidgetText("")
+							surname.setWidgetText("")
+							}, func(err as Error){
+								context.showMessageDialog("Notice", "Failed!")
+							})
+						}, func{
+							;
+						})
+				}
+			}
+		})
+})
+	updatebtn.setWidgetFontSize(context.getHeightValue("4mm"))
+	updatebtn.setWidgetBackgroundColor(Color.instance("#6aeb7f"))
+	vbox.addWidget(updatebtn)
+}
+
